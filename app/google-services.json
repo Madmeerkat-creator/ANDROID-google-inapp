@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "310591837779",
+    "project_id": "miraclenight-44db8",
+    "storage_bucket": "miraclenight-44db8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:310591837779:android:1557b950808731509d98a6",
+        "android_client_info": {
+          "package_name": "com.munice.miraclenight"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "310591837779-rfsfpil7hqsi210bfsp9gfinebsq70ap.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDv4xqbIAIHcThQdlhkGp2_2853jyAOztg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "310591837779-rfsfpil7hqsi210bfsp9gfinebsq70ap.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:310591837779:android:3ed7ad2cca70ed269d98a6",
+        "android_client_info": {
+          "package_name": "com.munice.miraclenighttest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "310591837779-rfsfpil7hqsi210bfsp9gfinebsq70ap.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDv4xqbIAIHcThQdlhkGp2_2853jyAOztg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "310591837779-rfsfpil7hqsi210bfsp9gfinebsq70ap.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
