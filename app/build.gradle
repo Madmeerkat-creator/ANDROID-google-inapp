@@ -53,8 +53,8 @@ dependencies {
     implementation 'com.google.android.gms:play-services-auth:20.2.0'
 
     //play store payment
-    implementation 'com.android.billingclient:billing-ktx:4.1.0'
     implementation 'com.google.code.gson:gson:2.8.8'
+    implementation 'com.android.billingclient:billing-ktx:4.1.0'
 
     //fragment
     implementation 'androidx.navigation:navigation-fragment-ktx:2.4.2'
