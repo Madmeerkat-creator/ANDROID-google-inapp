@@ -34,11 +34,7 @@ class PurchaseActivity : AppCompatActivity() {
         bm = BillingModule(this, lifecycleScope, object : BillingModule.Callback {
 
             override fun onBillingModulesIsReady() {
-                Log.d("mainTag", "start Something")
-                bm.querySkuDetail(
-                    BillingClient.SkuType.INAPP,
-                    Sku.BUY_4COINS
-                ) { skuDetails ->
+                bm.querySkuDetail(BillingClient.SkuType.INAPP, Sku.BUY_4COINS) { skuDetails ->
                     mSkuDetails = skuDetails
                 }
                 Log.d("mainTag", "mSkuDetails = $mSkuDetails")
@@ -46,7 +42,6 @@ class PurchaseActivity : AppCompatActivity() {
 
             override fun onSuccess(purchase: Purchase) {
                 Log.d("mainTag", "SUCCESS!!")
-
                 when (purchase.skus.get(0)) {
                     Sku.BUY_4COINS -> {
                         Log.d("mainTag", "DO something Buy coins!!")
@@ -103,4 +98,10 @@ class PurchaseActivity : AppCompatActivity() {
             }
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        bm.onResume(BillingClient.SkuType.INAPP)
+    }
+
 }

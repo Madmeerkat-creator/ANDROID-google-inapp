@@ -41,6 +41,29 @@ class BillingModule(
         .enablePendingPurchases()
         .build()
 
+    init {
+        Log.d("mainTag", "INIT START")
+        billingClient.startConnection(object : BillingClientStateListener {
+            override fun onBillingSetupFinished(billingResult: BillingResult) {
+                Log.d("mainTag", "onBillingSetupFinished")
+                Log.d("mainTag", "billingResult.responseCode = $billingResult.responseCode")
+                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                    // 여기서부터 billingClient 활성화 됨
+                    callback.onBillingModulesIsReady()
+                } else {
+                    callback.onFailure(billingResult.responseCode)
+                }
+            }
+
+            override fun onBillingServiceDisconnected() {
+                // GooglePlay와 연결이 끊어졌을때 재시도하는 로직이 들어갈 수 있음.
+                Log.e("BillingModule", "Disconnected.")
+            }
+        })
+        Log.d("mainTag", "INIT END")
+    }
+
+
     private fun confirmPurchase(purchase: Purchase) {
         Log.d("mainTag", "confirmPurchase start")
         when {
@@ -77,27 +100,6 @@ class BillingModule(
         }
     }
 
-    init {
-        Log.d("mainTag", "INIT START")
-        billingClient.startConnection(object : BillingClientStateListener {
-            override fun onBillingSetupFinished(billingResult: BillingResult) {
-                Log.d("mainTag", "onBillingSetupFinished")
-                Log.d("mainTag", "billingResult.responseCode = $billingResult.responseCode")
-                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                    // 여기서부터 billingClient 활성화 됨
-                    callback.onBillingModulesIsReady()
-                } else {
-                    callback.onFailure(billingResult.responseCode)
-                }
-            }
-
-            override fun onBillingServiceDisconnected() {
-                // GooglePlay와 연결이 끊어졌을때 재시도하는 로직이 들어갈 수 있음.
-                Log.e("BillingModule", "Disconnected.")
-            }
-        })
-        Log.d("mainTag", "INIT END")
-    }
 
     /**
      * 원하는 sku id를 가지고있는 상품 정보를 가져옵니다.
@@ -122,6 +124,7 @@ class BillingModule(
         }
     }
 
+
     /**
      * 구매 시작하기
      * @param skuDetail 구매하고자하는 항목. querySkuDetail()을 통해 획득한 SkuDetail
@@ -141,6 +144,42 @@ class BillingModule(
             callback.onFailure(responseCode)
         }
         // 이후 부터는 purchasesUpdatedListener를 거치게 됩니다.
+    }
+
+
+//    /**
+//     * 구매 여부 체크, 소비성 구매가 아닌 항목에 한정.
+//     * @param sku
+//     */
+//    fun checkPurchased(
+//        sku: String,
+//        resultBlock: (purchased: Boolean) -> Unit
+//    ) {
+//        billingClient.queryPurchases(BillingClient.SkuType.INAPP).purchasesList?.let { purchaseList ->
+//            for (purchase in purchaseList) {
+//                if (purchase.skus.get(0) == sku && purchase.isPurchaseConfirmed()) {
+//                    return resultBlock(true)
+//                }
+//            }
+//            return resultBlock(false)
+//        }
+//    }
+
+//    // 구매 확인 검사 Extension
+//    private fun Purchase.isPurchaseConfirmed(): Boolean {
+//        return this.isAcknowledged && this.purchaseState == Purchase.PurchaseState.PURCHASED
+//    }
+
+    suspend fun onResume(type: String) {
+        if (billingClient.isReady) {
+            billingClient.queryPurchasesAsync(type).purchasesList?.let { purchaseList ->
+                for (purchase in purchaseList) {
+                    if (!purchase.isAcknowledged && purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
+                        confirmPurchase(purchase)
+                    }
+                }
+            }
+        }
     }
 
 
