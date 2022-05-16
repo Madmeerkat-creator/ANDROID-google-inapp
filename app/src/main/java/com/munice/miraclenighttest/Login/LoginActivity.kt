@@ -20,6 +20,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import com.munice.miraclenighttest.MainActivity
+import com.munice.miraclenighttest.Purchase.PurchaseActivity
 import com.munice.miraclenighttest.R
 import com.munice.miraclenighttest.databinding.ActivityLoginBinding
 
@@ -90,7 +91,7 @@ class LoginActivity : AppCompatActivity() {
         Log.d("mainTag", user?.uid.toString())
         if (user != null) {
             startActivity(
-                Intent(this, MainActivity::class.java)
+                Intent(this, PurchaseActivity::class.java)
             )
         }
     }

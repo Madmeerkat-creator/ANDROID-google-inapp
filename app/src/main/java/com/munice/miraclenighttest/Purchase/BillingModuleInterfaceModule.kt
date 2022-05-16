@@ -4,17 +4,16 @@ import android.app.Activity
 import android.util.Log
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.android.billingclient.api.*
-import com.android.billingclient.api.BillingFlowParams.ProrationMode.IMMEDIATE_WITH_TIME_PRORATION
-import com.munice.miraclenighttest.Sku
+import com.munice.miraclenighttest.Purchase.BillingModuleInterface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class BillingModule(
+class BillingModuleInterfaceModule(
     private val activity: Activity,
     private val lifeCycleScope: LifecycleCoroutineScope,
     private val callback: Callback
-) {
+):BillingModuleInterface {
     private val consumableSkus = setOf(Sku.BUY_4COINS)
 
     // 구매관련 업데이트 수신
@@ -64,7 +63,7 @@ class BillingModule(
     }
 
 
-    private fun confirmPurchase(purchase: Purchase) {
+    override fun confirmPurchase(purchase: Purchase) {
         Log.d("mainTag", "confirmPurchase start")
         when {
             consumableSkus.contains(Sku.BUY_4COINS) -> {
@@ -106,10 +105,10 @@ class BillingModule(
      * @param sku sku 목록
      * @param resultBlock sku 상품정보 콜백
      */
-    fun querySkuDetail(
-        type: String = BillingClient.SkuType.INAPP,
+    override fun querySkuDetail(
+        type: String ,
         vararg sku: String,
-        resultBlock: (List<SkuDetails>) -> Unit = {}
+        resultBlock: (List<SkuDetails>) -> Unit
     ) {
         SkuDetailsParams.newBuilder().apply {
             // 인앱, 정기결제 유형중에서 고름. (SkuType.INAPP, SkuType.SUBS)
@@ -129,7 +128,7 @@ class BillingModule(
      * 구매 시작하기
      * @param skuDetail 구매하고자하는 항목. querySkuDetail()을 통해 획득한 SkuDetail
      */
-    fun purchase(
+    override fun purchase(
         skuDetail: SkuDetails
     ) {
         Log.d("mainTag", "skuDetail = $skuDetail")
@@ -170,7 +169,7 @@ class BillingModule(
 //        return this.isAcknowledged && this.purchaseState == Purchase.PurchaseState.PURCHASED
 //    }
 
-    suspend fun onResume(type: String) {
+    override suspend fun onResume(type: String) {
         if (billingClient.isReady) {
             billingClient.queryPurchasesAsync(type).purchasesList?.let { purchaseList ->
                 for (purchase in purchaseList) {

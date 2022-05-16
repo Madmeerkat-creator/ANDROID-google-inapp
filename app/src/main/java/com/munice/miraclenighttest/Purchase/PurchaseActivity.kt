@@ -8,15 +8,20 @@ import androidx.lifecycle.lifecycleScope
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.SkuDetails
-import com.munice.miraclenighttest.BillingModule
-import com.munice.miraclenighttest.R
+import com.munice.miraclenighttest.BillingModuleInterfaceModule
 import com.munice.miraclenighttest.Sku
 import com.munice.miraclenighttest.databinding.ActivityPurchaseBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class PurchaseActivity : AppCompatActivity() {
     private val TAG = "mainTag"
     private lateinit var binding: ActivityPurchaseBinding
-    private lateinit var bm: BillingModule
+    private lateinit var bm: BillingModuleInterfaceModule
+    @DelicateCoroutinesApi
+    private val defaultScope: CoroutineScope = GlobalScope
 
     //    private lateinit var bm: BillingModule
     private var mSkuDetails = listOf<SkuDetails>()
@@ -31,46 +36,53 @@ class PurchaseActivity : AppCompatActivity() {
         binding = ActivityPurchaseBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        bm = BillingModule(this, lifecycleScope, object : BillingModule.Callback {
+        bm = BillingModuleInterfaceModule(
+            this,
+            lifecycleScope,
+            object : BillingModuleInterfaceModule.Callback {
 
-            override fun onBillingModulesIsReady() {
-                bm.querySkuDetail(BillingClient.SkuType.INAPP, Sku.BUY_4COINS) { skuDetails ->
-                    mSkuDetails = skuDetails
+                override fun onBillingModulesIsReady() {
+                    bm.querySkuDetail(BillingClient.SkuType.INAPP, Sku.BUY_4COINS) { skuDetails ->
+                        mSkuDetails = skuDetails
+                    }
+                    Log.d("mainTag", "mSkuDetails = $mSkuDetails")
                 }
-                Log.d("mainTag", "mSkuDetails = $mSkuDetails")
-            }
 
-            override fun onSuccess(purchase: Purchase) {
-                Log.d("mainTag", "SUCCESS!!")
-                when (purchase.skus.get(0)) {
-                    Sku.BUY_4COINS -> {
-                        Log.d("mainTag", "DO something Buy coins!!")
-                    }
-                }
-            }
-
-            override fun onFailure(errorCode: Int) {
-                Log.d("mainTag", "FAIL!!")
-                when (errorCode) {
-                    BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED -> {
-                        Toast.makeText(this@PurchaseActivity, "이미 구입한 상품입니다.", Toast.LENGTH_LONG)
-                            .show()
-                    }
-                    BillingClient.BillingResponseCode.USER_CANCELED -> {
-                        Toast.makeText(this@PurchaseActivity, "구매를 취소하셨습니다.", Toast.LENGTH_LONG)
-                            .show()
-                    }
-                    else -> {
-                        Toast.makeText(
-                            this@PurchaseActivity,
-                            "error: $errorCode",
-                            Toast.LENGTH_LONG
-                        )
-                            .show()
+                override fun onSuccess(purchase: Purchase) {
+                    Log.d("mainTag", "SUCCESS!!")
+                    when (purchase.skus.get(0)) {
+                        Sku.BUY_4COINS -> {
+                            Log.d("mainTag", "DO something Buy coins!!")
+                        }
                     }
                 }
-            }
-        })
+
+                override fun onFailure(errorCode: Int) {
+                    Log.d("mainTag", "FAIL!!")
+                    when (errorCode) {
+                        BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED -> {
+                            Toast.makeText(
+                                this@PurchaseActivity,
+                                "이미 구입한 상품입니다.",
+                                Toast.LENGTH_LONG
+                            )
+                                .show()
+                        }
+                        BillingClient.BillingResponseCode.USER_CANCELED -> {
+                            Toast.makeText(this@PurchaseActivity, "구매를 취소하셨습니다.", Toast.LENGTH_LONG)
+                                .show()
+                        }
+                        else -> {
+                            Toast.makeText(
+                                this@PurchaseActivity,
+                                "error: $errorCode",
+                                Toast.LENGTH_LONG
+                            )
+                                .show()
+                        }
+                    }
+                }
+            })
 
         setClickListeners()
     }
@@ -101,7 +113,9 @@ class PurchaseActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        bm.onResume(BillingClient.SkuType.INAPP)
+        defaultScope.launch {
+            bm.onResume(BillingClient.SkuType.INAPP)
+        }
     }
 
 }

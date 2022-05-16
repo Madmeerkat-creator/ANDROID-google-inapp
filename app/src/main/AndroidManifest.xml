@@ -14,7 +14,7 @@
         android:theme="@style/Theme.MiraclenightTest"
         tools:targetApi="31">
         <activity
-            android:name=".PurchaseActivity"
+            android:name=".Purchase.PurchaseActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
